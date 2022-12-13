@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
+	sid "github.com/teris-io/shortid"
 	"log"
 	"math/rand"
 	"time"
 )
 
 type Report struct {
+	ReportId                         string
 	CustomersAttendedInMorningShift  int
 	CustomerAttendedInAfternoonShift int
 	CustomerAttendedCount            int
@@ -91,9 +93,11 @@ func main() {
 	fmt.Println("Ingrese la cantidad de recursos a utilizar")
 	fmt.Scanln(&resourceCount)
 
+	reportId, err := sid.Generate()
+
 	var stations []Station
 	var dailyReport Report
-	finalReport := Report{0, 0, 0, "reporte final"}
+	finalReport := Report{reportId, 0, 0, 0, "reporte final"}
 
 	daysConvertedToMinutes := daysRunning * MINUTES_IN_A_DAY
 	passedDays := 0
@@ -109,7 +113,7 @@ func main() {
 			afternoonShiftResources = resourceCount - morningShiftResources
 			fmt.Println(fmt.Sprintf("para el día %d se habilitan %d recursos para la mañana y %d recursos para la tarde", passedDays+1, morningShiftResources, afternoonShiftResources))
 			stations = setUpStations(stationsCount, morningShiftResources)
-			dailyReport = Report{0, 0, 0, fmt.Sprintf("reporte del día %d", passedDays+1)}
+			dailyReport = Report{reportId, 0, 0, 0, fmt.Sprintf("reporte del día %d", passedDays+1)}
 			frequency = 0.31
 		} else if currentDayMinutesPassed+1 == MINUTES_IN_AN_HOUR*3 {
 			frequency = 0.46
