@@ -16,6 +16,8 @@ type Report struct {
 	CustomersAttendedInMorningShift  int
 	CustomerAttendedInAfternoonShift int
 	CustomerAttendedCount            int
+	StationsCount                    int
+	ResourcesCount                   int
 	Message                          string
 }
 
@@ -97,7 +99,7 @@ func main() {
 
 	var stations []Station
 	var dailyReport Report
-	finalReport := Report{reportId, 0, 0, 0, "reporte final"}
+	finalReport := Report{reportId, 0, 0, 0, stationsCount, resourceCount, "reporte final"}
 
 	daysConvertedToMinutes := daysRunning * MINUTES_IN_A_DAY
 	passedDays := 0
@@ -113,7 +115,7 @@ func main() {
 			afternoonShiftResources = resourceCount - morningShiftResources
 			fmt.Println(fmt.Sprintf("para el día %d se habilitan %d recursos para la mañana y %d recursos para la tarde", passedDays+1, morningShiftResources, afternoonShiftResources))
 			stations = setUpStations(stationsCount, morningShiftResources)
-			dailyReport = Report{reportId, 0, 0, 0, fmt.Sprintf("reporte del día %d", passedDays+1)}
+			dailyReport = Report{reportId, 0, 0, 0, stationsCount, resourceCount, fmt.Sprintf("reporte del día %d", passedDays+1)}
 			frequency = 0.31
 		} else if currentDayMinutesPassed+1 == MINUTES_IN_AN_HOUR*3 {
 			frequency = 0.46

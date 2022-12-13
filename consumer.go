@@ -19,6 +19,8 @@ type Report struct {
 	CustomersAttendedInMorningShift  int    `json:"CustomersAttendedInMorningShift"`
 	CustomerAttendedInAfternoonShift int    `json:"CustomerAttendedInAfternoonShift"`
 	CustomerAttendedCount            int    `json:"CustomerAttendedCount"`
+	StationsCount                    int    `json:"StationsCount"`
+	ResourcesCount                   int    `json:"ResourcesCount"`
 	Message                          string `json:"Message"`
 }
 
@@ -53,7 +55,7 @@ func main() {
 				log.Println(err)
 			}
 			defer f.Close()
-			t := fmt.Sprintf("%d,%d,%d,%s \n", reportData.CustomerAttendedCount, reportData.CustomersAttendedInMorningShift, reportData.CustomerAttendedInAfternoonShift, reportData.Message)
+			t := fmt.Sprintf("%d,%d,%d,%d,%d,%s \n", reportData.StationsCount, reportData.ResourcesCount, reportData.CustomerAttendedCount, reportData.CustomersAttendedInMorningShift, reportData.CustomerAttendedInAfternoonShift, reportData.Message)
 			if _, err := f.Write([]byte(t)); err != nil {
 				log.Println(err)
 			}
