@@ -11,18 +11,18 @@ import (
 )
 
 type Report struct {
-	customersAttendedInMorningShift  int
-	customerAttendedInAfternoonShift int
-	customerAttendedCount            int
-	message                          string
+	CustomersAttendedInMorningShift  int
+	CustomerAttendedInAfternoonShift int
+	CustomerAttendedCount            int
+	Message                          string
 }
 
 type Station struct {
-	number              int  // Número de estación
-	queueCount          int  // Tamaño de la cola
-	available           bool // Si la estación está abierta
-	nextMinuteAvailable int  // Cuando terminará de atender a la persona actual
-	occupied            bool // Si la estación está atendiendo a alguien
+	Number              int  // Número de estación
+	QueueCount          int  // Tamaño de la cola
+	Available           bool // Si la estación está abierta
+	NextMinuteAvailable int  // Cuando terminará de atender a la persona actual
+	Occupied            bool // Si la estación está atendiendo a alguien
 }
 
 var MINUTES_IN_A_DAY = 1440
@@ -52,7 +52,7 @@ func setUpStations(stationsCount int, availableResources int) []Station {
 func changeShift(stations []Station, availableResources int) []Station {
 	length := len(stations)
 	for i := 0; i < length; i++ {
-		stations[i].available = length-i-1 < availableResources
+		stations[i].Available = length-i-1 < availableResources
 	}
 	return stations
 }
@@ -109,7 +109,7 @@ func main() {
 			afternoonShiftResources = resourceCount - morningShiftResources
 			fmt.Println(fmt.Sprintf("para el día %d se habilitan %d recursos para la mañana y %d recursos para la tarde", passedDays+1, morningShiftResources, afternoonShiftResources))
 			stations = setUpStations(stationsCount, morningShiftResources)
-			dailyReport = Report{0, 0, 0, fmt.Sprintf("reporte del día %s", passedDays+1)}
+			dailyReport = Report{0, 0, 0, fmt.Sprintf("reporte del día %d", passedDays+1)}
 			frequency = 0.31
 		} else if currentDayMinutesPassed+1 == MINUTES_IN_AN_HOUR*3 {
 			frequency = 0.46
@@ -133,20 +133,20 @@ func main() {
 			preferredStation := stations[0]
 			for j := 0; j < stationsCount; j++ {
 				currentStation := stations[j]
-				currentStationHasPreference := currentStation.queueCount < preferredStation.queueCount || (preferredStation.occupied && !currentStation.occupied)
-				if currentStation.available && (!preferredStation.available || currentStationHasPreference) {
+				currentStationHasPreference := currentStation.QueueCount < preferredStation.QueueCount || (preferredStation.Occupied && !currentStation.Occupied)
+				if currentStation.Available && (!preferredStation.Available || currentStationHasPreference) {
 					preferredStation = currentStation
 				}
 			}
 
-			if preferredStation.queueCount > 0 || preferredStation.occupied {
-				stations[preferredStation.number].queueCount = preferredStation.queueCount + 1
+			if preferredStation.QueueCount > 0 || preferredStation.Occupied {
+				stations[preferredStation.Number].QueueCount = preferredStation.QueueCount + 1
 			} else {
 				rand.Seed(time.Now().UnixNano())
 				var attentionTime = rand.Intn(6) + 5
 
-				stations[preferredStation.number].occupied = true
-				stations[preferredStation.number].nextMinuteAvailable = currentDayMinutesPassed + attentionTime
+				stations[preferredStation.Number].Occupied = true
+				stations[preferredStation.Number].NextMinuteAvailable = currentDayMinutesPassed + attentionTime
 			}
 
 		}
@@ -155,22 +155,22 @@ func main() {
 			currentStation := stations[j]
 			// Debuggear estaciones
 			//fmt.Println(currentStation)
-			if currentDayMinutesPassed == currentStation.nextMinuteAvailable {
-				dailyReport.customerAttendedCount++
+			if currentDayMinutesPassed == currentStation.NextMinuteAvailable {
+				dailyReport.CustomerAttendedCount++
 
 				if isMorningShift {
-					dailyReport.customersAttendedInMorningShift++
+					dailyReport.CustomersAttendedInMorningShift++
 				} else {
-					dailyReport.customerAttendedInAfternoonShift++
+					dailyReport.CustomerAttendedInAfternoonShift++
 				}
-				if currentStation.queueCount > 0 {
-					stations[currentStation.number].queueCount = currentStation.queueCount - 1
+				if currentStation.QueueCount > 0 {
+					stations[currentStation.Number].QueueCount = currentStation.QueueCount - 1
 
 					var attentionTime = rand.Intn(6) + 5
 
-					stations[currentStation.number].nextMinuteAvailable = currentDayMinutesPassed + attentionTime
+					stations[currentStation.Number].NextMinuteAvailable = currentDayMinutesPassed + attentionTime
 				} else {
-					stations[currentStation.number].occupied = false
+					stations[currentStation.Number].Occupied = false
 				}
 			}
 		}
@@ -180,9 +180,9 @@ func main() {
 		if i > 0 && (i+1)%MINUTES_IN_A_DAY == 0 {
 			passedDays += 1
 			currentDayMinutesPassed = 0
-			finalReport.customerAttendedInAfternoonShift += dailyReport.customerAttendedInAfternoonShift
-			finalReport.customersAttendedInMorningShift += dailyReport.customersAttendedInMorningShift
-			finalReport.customerAttendedCount += dailyReport.customerAttendedCount
+			finalReport.CustomerAttendedInAfternoonShift += dailyReport.CustomerAttendedInAfternoonShift
+			finalReport.CustomersAttendedInMorningShift += dailyReport.CustomersAttendedInMorningShift
+			finalReport.CustomerAttendedCount += dailyReport.CustomerAttendedCount
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
